@@ -17,8 +17,6 @@ export default {
     showNewMember: 'Show New Member',
     showGift: 'Show Gift',
     showGiftInfo: 'Show gift info',
-    mergeSameUserDanmaku: "Merge same user's message",
-    mergeSameUserDanmakuInterval: "Message Interval of merge same user's message(sec)",
     mergeSimilarDanmaku: 'Merge similar messages',
     mergeGift: 'Merge gifts',
     danmakuAtBottom: 'Align messages to bottom',
@@ -38,7 +36,6 @@ export default {
     
     autoRenderOfficialEmoji: 'auto add official emoji',
     isGreedyMatch: 'is greedy match',
-    isSkipSameImage: 'not show same image multiple times',
     imageShowType: 'Way image show',
     imageShowTypes: [
       {
@@ -173,12 +170,9 @@ export default {
     messages: 'Messages',
     color: 'Color',
     onNewLine: 'On new line',
-    mergeSameUser: "Merge same user's messages",
-    groupBlockPadding: "messages' padding in message group",
 
     time: 'Timestamps',
     showTime: 'Show timestamps',
-    showTimeRight: 'Show timestamps at right',
 
     backgrounds: 'Backgrounds',
     bgColor: 'Background color',

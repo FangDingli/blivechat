@@ -3,7 +3,6 @@
   :showGiftInfo="config.showGiftInfo"
   :danmakuAtBottom="config.danmakuAtBottom"
   :tickerAtButtom="config.tickerAtButtom"
-  :mergeSameUserDanmakuInterval="config.mergeSameUserDanmakuInterval"
   :minGiftPrice="config.minGiftPrice"
   :minTickerPrice="config.minTickerPrice"
   :maxNumber="config.maxNumber"
@@ -68,7 +67,7 @@ export default {
       }
       return res
     },
-    // 解析用户设置的 emoticons
+    // TODO: 解析用户设置的 emoticons
     emoticonsTrie() {
       let res = new trie.Trie()
       for (let emoticon of this.config.emoticons) {
@@ -126,8 +125,6 @@ export default {
       cfg.showGift = toBool(cfg.showGift)
       cfg.showGiftInfo = toBool(cfg.showGiftInfo)
 
-      cfg.mergeSameUserDanmaku = toBool(cfg.mergeSameUserDanmaku)
-      cfg.mergeSameUserDanmakuInterval = toInt(cfg.mergeSameUserDanmakuInterval)
       cfg.mergeSimilarDanmaku = toBool(cfg.mergeSimilarDanmaku)
       cfg.mergeGift = toBool(cfg.mergeGift)
 
@@ -138,9 +135,9 @@ export default {
       cfg.showTranslateDanmakuOnly = toBool(cfg.showTranslateDanmakuOnly)
       cfg.translationSign = cfg.translationSign.toString()
 
+      // TODO: blockGiftDanmaku
       cfg.autoRenderOfficialEmoji = toBool(cfg.autoRenderOfficialEmoji)
       cfg.isGreedyMatch = toBool(cfg.isGreedyMatch)
-      cfg.isSkipSameImage = toBool(cfg.isSkipSameImage)
       cfg.maxNumber = toInt(cfg.maxNumber, chatConfig.DEFAULT_CONFIG.maxNumber)
       cfg.fadeOutNum = toInt(cfg.fadeOutNum, chatConfig.DEFAULT_CONFIG.fadeOutNum)
       cfg.pinTime = toInt(cfg.pinTime, chatConfig.DEFAULT_CONFIG.pinTime)
@@ -200,24 +197,12 @@ export default {
       this.chatClient.stop()
     },
 
-    async onAddText(data) {
-      if (!this.config.showDanmaku || !this.filterTextMessage(data)) {
+    onAddText(data) {
+      if (!this.config.showDanmaku || !this.filterTextMessage(data) || this.mergeSimilarText(data.content)) {
+        // console.log("收到一般消息弹幕，但：是否显示弹幕为" + this.config.showDanmaku + "，是否合并弹幕为" + this.config.mergeSimilarDanmaku)
         return
       }
-      // 合并相似弹幕
-      if (await this.mergeSimilarText(data.content)) {
-        return
-      }
-      // 合并同一用户短期内的发言
-      if(this.mergeSameUserText(data.content, this.getRichContent(data), data.authorName, data.timestamp)) {
-        // console.log("收到同一个 User 发送的消息")
-        // 合并消息，即插入到 Thread 的消息需要单独写平滑（拉了，和原本的平滑方案没有很好的融合）
-        this.$refs.renderer.calculateHeight()
-        await this.$refs.renderer.$nextTick()
-        this.$refs.renderer.showNewMessages()
-        return
-      }
-
+      // TODO: 只显示翻译弹幕
       if (this.config.showTranslateDanmakuOnly) {
         let content_str = data.content
         if (content_str.charAt(0) !== this.config.translationSign) {
@@ -228,6 +213,7 @@ export default {
         }
       }
 
+      // TODO: 屏蔽翻译弹幕
       if (this.config.blockTranslateDanmaku) {
         let content_str = data.content
         if (content_str.charAt(0) === this.config.translationSign) {
@@ -235,13 +221,7 @@ export default {
         }
       }
       
-      // TODO: 不是同一个user的消息的话，开启新的 thread
-      // 拉了，为了减少对 key 的修改
-      // 直接把Thread塞到原本的 content 和 richContent
-      let contentThread = []
-      contentThread[0] = data.content
-      let richContentThread = []
-      richContentThread[0] = this.getRichContent(data)
+      // TODO: richContent 的研究
       let message = {
         id: data.id,
         type: constants.MESSAGE_TYPE_TEXT,
@@ -249,15 +229,13 @@ export default {
         time: new Date(data.timestamp * 1000),
         authorName: data.authorName,
         authorType: data.authorType,
-        content: contentThread,
-        richContent: richContentThread,
+        content: data.content,
+        richContent: this.getRichContent(data),
         privilegeType: data.privilegeType,
         medalName: data.medalName,
         medalLevel: data.medalLevel,
         isFanGroup: data.isFanGroup,
         repeated: 1,
-        repeatedThread:[1],
-        threadLength: 1,
         translation: data.translation
       }
       this.$refs.renderer.addMessage(message)
@@ -392,12 +370,6 @@ export default {
     filterByAuthorName(authorName) {
       return !this.blockUsersTrie.has(authorName)
     },
-    mergeSameUserText(content, richContent, authorName, time) {
-      if (!this.config.mergeSameUserDanmaku) {
-        return false
-      }
-      return this.$refs.renderer.mergeSameUserText(content, richContent, authorName, time)
-    },
     mergeSimilarText(content) {
       if (!this.config.mergeSimilarDanmaku) {
         return false
@@ -429,10 +401,10 @@ export default {
       }
 
       // B站官方表情
-      // 屏蔽官方表情
+      // TODO: 屏蔽官方表情
       if (data.emoticon !== null && this.config.autoRenderOfficialEmoji === true) {
         richContent.push({
-          type: constants.CONTENT_TYPE_EMOTICON,
+          type: constants.CONTENT_TYPE_EMOJI,
           text: data.content,
           url: data.emoticon
         })
@@ -448,14 +420,14 @@ export default {
         return richContent
       }
 
+      // FIXME: getRichContent 核心拆分文字表情emoticon代码
       // 可能含有自定义表情，需要解析
       let emoticonsTrie = this.emoticonsTrie
       let startPos = 0
       let pos = 0
-      let emoticonCount = 0
+      let emojiCount = 0
       let imageCount = 0
-      let emoticonMap = {}
-      if (this.config.imageShowType === constants.IMAGE_SHOW_TYPE_ADD_AFTER) {
+      if (this.config.imageShowType === 1) {
         richContent.push({
           type: constants.CONTENT_TYPE_TEXT,
           text: data.content
@@ -463,6 +435,7 @@ export default {
       }
       while (pos < data.content.length) {
         let remainContent = data.content.substring(pos)
+        // TODO: 新增 nonGreedyMatch
         let matchEmoticon
         if (this.config.isGreedyMatch) {
           matchEmoticon = emoticonsTrie.greedyMatch(remainContent)
@@ -476,8 +449,8 @@ export default {
           // 直到找到第1个 emoticon
         }
 
-        // 如果是替换文字为图片，则加入之前的文本
-        if (pos !== startPos && this.config.imageShowType === constants.IMAGE_SHOW_TYPE_REPLACE) {
+        // 加入之前的文本
+        if (pos !== startPos && this.config.imageShowType !== 1) {
           richContent.push({
             type: constants.CONTENT_TYPE_TEXT,
             text: data.content.slice(startPos, pos)
@@ -485,56 +458,39 @@ export default {
         }
 
         // 加入表情
+        // TODO: 增加 emoticon 舰长等级 data.privilegeType
+        // 如果不满足使用权限，或者超过inline,block类型图片各自的上限
         let emoticonLevel = toInt(matchEmoticon.level)
         let privilegeType = toInt(data.privilegeType)
-        // 如果不满足使用权限
-        // 或者超过inline, block类型图片各自的上限
-        if ((emoticonLevel > constants.PRIVILEGE_TYPE_ALL && (privilegeType > emoticonLevel || privilegeType === constants.PRIVILEGE_TYPE_ALL))
-          || (matchEmoticon.align === 'inline' && emoticonCount >= this.config.maxEmoji)
-          || (matchEmoticon.align === 'block' && imageCount >= this.config.maxImage)) {
-          // 如果是替换文字为图片才需要添加文字
-          if (this.config.imageShowType === constants.IMAGE_SHOW_TYPE_REPLACE) {
-            richContent.push({
-              type: constants.CONTENT_TYPE_TEXT,
-              text: matchEmoticon.keyword
-            })
-          }
-        } else { // 如果没有
-          
-          // 如果没有开启【不多次显示重复图片】或者说【当前图片没出现过】
-          if(this.config.isSkipSameImage === false || emoticonMap[matchEmoticon.url] === undefined) {
-            emoticonMap[matchEmoticon.url] = true; // 将出现过的图片记录到 map
-            // 记录图片数量，对应inline, block类型
-            if (matchEmoticon.align === 'inline') {
-              emoticonCount++
-            } else {
-              imageCount++
-            }
-            // 添加图片到消息内容
-            richContent.push({
-              type: constants.CONTENT_TYPE_IMAGE,
-              text: matchEmoticon.keyword,
-              align: matchEmoticon.align,
-              height: matchEmoticon.height,
-              level: matchEmoticon.level,
-              url: matchEmoticon.url
-            })
-          } else {
-            // 只有替换文字为表情包的模式需要添加文字，否则直接跳过
-            if(this.config.imageShowType === constants.IMAGE_SHOW_TYPE_REPLACE) {
-              richContent.push({
-                type: constants.CONTENT_TYPE_TEXT,
-                text: matchEmoticon.keyword
-             })
-            } // end if
-          } // end else
 
-        } // end else
+        if ((emoticonLevel > 0 && (privilegeType > emoticonLevel || privilegeType == 0))
+          || (matchEmoticon.align === 'inline' && emojiCount >= this.config.maxEmoji)
+          || (matchEmoticon.align === 'block' && imageCount >= this.config.maxImage)) {
+          richContent.push({
+            type: constants.CONTENT_TYPE_TEXT,
+            text: matchEmoticon.keyword
+          })
+        } else {
+          // 如果没有
+          if (matchEmoticon.align === 'inline') {
+            emojiCount++
+          } else {
+            imageCount++
+          }
+          richContent.push({
+            type: constants.CONTENT_TYPE_IMAGE,
+            text: matchEmoticon.keyword,
+            align: matchEmoticon.align,
+            height: matchEmoticon.height,
+            level: matchEmoticon.level,
+            url: matchEmoticon.url
+          })
+        }
         pos += matchEmoticon.keyword.length
         startPos = pos
       } // end while
-      // 如果是替换文字为表情包，则加入尾部的文本
-      if (pos !== startPos && this.config.imageShowType === constants.IMAGE_SHOW_TYPE_REPLACE) {
+      // 加入尾部的文本
+      if (pos !== startPos && this.config.imageShowType !== 1) {
         richContent.push({
           type: constants.CONTENT_TYPE_TEXT,
           text: data.content.slice(startPos, pos)

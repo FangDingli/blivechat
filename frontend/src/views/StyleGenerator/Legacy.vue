@@ -78,7 +78,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-divider></el-divider>
         <el-row :gutter="20">
           <el-col :xs="24" :sm="12">
             <el-form-item :label="$t('stylegen.randomUserNamesColor')">
@@ -110,7 +109,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-divider></el-divider>
         <el-row :gutter="20">
           <el-col :xs="24" :sm="12">
             <el-form-item :label="$t('stylegen.showBadges')">
@@ -191,41 +189,21 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-divider></el-divider>
+        <el-form-item :label="$t('stylegen.onNewLine')">
+          <el-switch v-model="form.messageOnNewLine"></el-switch>
+        </el-form-item>
         <el-row :gutter="20">
-          <el-col :xs="24" :sm="12">
-            <el-form-item :label="$t('stylegen.onNewLine')">
-              <el-switch v-model="form.messageOnNewLine"></el-switch>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="24" :sm="12">
-            <el-form-item :label="$t('stylegen.mergeSameUser')">
-              <el-switch v-model="form.messageMergeSameUser"></el-switch>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12">
-            <el-form-item :label="$t('stylegen.groupBlockPadding')">
-              <el-input v-model.number="form.messageGroupBlockPadding" type="number" min="0"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-divider></el-divider>
-        <el-row :gutter="20">
-          <el-col :xs="24" :sm="12">
+          <el-col :xs="24" :sm="8">
             <el-form-item :label="$t('stylegen.emoticonSize')">
               <el-input v-model.number="form.emoticonSize" type="number" min="0"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :xs="24" :sm="12">
+          <el-col :xs="24" :sm="8">
             <el-form-item :label="$t('stylegen.emoticonInlineBorderRadius')">
               <el-input v-model.number="form.emoticonInlineBorderRadius" type="number" min="0"></el-input>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :xs="24" :sm="12">
+          <el-col :xs="24" :sm="8">
             <el-form-item :label="$t('stylegen.emoticonBlockBorderRadius')">
               <el-input v-model.number="form.emoticonBlockBorderRadius" type="number" min="0"></el-input>
             </el-form-item>
@@ -235,18 +213,9 @@
 
       <h3>{{ $t('stylegen.time') }}</h3>
       <el-card shadow="never">
-        <el-row :gutter="20">
-          <el-col :xs="24" :sm="12">
-            <el-form-item :label="$t('stylegen.showTime')">
-              <el-switch v-model="form.showTime"></el-switch>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12">
-            <el-form-item :label="$t('stylegen.showTimeRight')">
-              <el-switch v-model="form.showTimeRight"></el-switch>
-            </el-form-item>
-          </el-col>
-        </el-row>
+        <el-form-item :label="$t('stylegen.showTime')">
+          <el-switch v-model="form.showTime"></el-switch>
+        </el-form-item>
         <el-row :gutter="20">
           <el-col :xs="24" :sm="12">
             <el-form-item :label="$t('stylegen.font')">
@@ -498,16 +467,13 @@ export const DEFAULT_CONFIG = {
   messageLineHeight: 0,
   messageColor: '#ffffff',
   messageOnNewLine: false,
-  // TODO: Legacy 样式生成器-支持合并同用户消息
-  messageMergeSameUser: true,
-  messageGroupBlockPadding: 4,
 
+  // TODO: 表情包默认大小
   emoticonSize: 48,
   emoticonInlineBorderRadius: 0,
   emoticonBlockBorderRadius: 4,
 
   showTime: false,
-  showTimeRight: true,
   timeFont: 'Imprima',
   timeFontSize: 16,
   timeLineHeight: 0,
@@ -719,36 +685,6 @@ ${this.form.messageOnNewLine ? `yt-live-chat-text-message-renderer #image-and-me
   display: inline !important;
   overflow: visible !important;
 }`}
-
-${this.form.messageMergeSameUser ? `/* Thread 设定 */
-#thread {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-#thread img.yt-img-shadow {
-    visibility: hidden;
-    height: 0;
-
-}
-#thread #card yt-live-chat-author-chip {
-    display: none;
-}
-yt-live-chat-text-message-renderer #content {
-  margin-top: ${this.form.messageGroupBlockPadding}px;
-}
-/* 单独处理圆角 */
-yt-live-chat-text-message-renderer #thread>#card:first-child #content{
-    margin-top:4px;
-}
-#thread>#card:first-child yt-live-chat-author-chip {
-    display: flex;
-}
-#thread>#card:first-child img.yt-img-shadow {
-    visibility: visible;
-    height: auto;
-}`:``}
-
 
 yt-live-chat-text-message-renderer #message {
   display: inline !important;

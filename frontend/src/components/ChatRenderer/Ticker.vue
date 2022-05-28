@@ -76,7 +76,7 @@ export default {
   data() {
     return {
       MESSAGE_TYPE_MEMBER: constants.MESSAGE_TYPE_MEMBER,
-
+      MESSAGE_TYPE_SUPER_CHAT: constants.MESSAGE_TYPE_SUPER_CHAT,
       curTime: new Date(),
       updateTimerId: window.setInterval(this.updateProgress, 1000),
       pinnedMessage: null
@@ -156,7 +156,7 @@ export default {
         color1 = config.colors.contentBg
         color2 = config.colors.headerBg
       }
-      
+
       return { primaryColor: color1, secondaryColor: color2 }
     },
     getFormatBgColor(message) {
@@ -183,7 +183,7 @@ export default {
     getText(message) {
       if (message.type === constants.MESSAGE_TYPE_MEMBER) {
         return ''
-        // 方便用户 CSS 自定义
+        // FIXME: 方便用户 CSS 自定义
         // return this.$t('chat.tickerMembership')
       }
       return `CN¥${formatCurrency(message.price)}`

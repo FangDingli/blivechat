@@ -17,8 +17,6 @@ export default {
     showNewMember: '显示新舰长',
     showGift: '显示礼物',
     showGiftInfo: '显示礼物信息',
-    mergeSameUserDanmaku: '合并同用户的连续弹幕',
-    mergeSameUserDanmakuInterval: '合并同用户的连续弹幕的最大时间间隔(秒)',
     mergeSimilarDanmaku: '合并相似弹幕',
     mergeGift: '合并礼物',
 
@@ -29,7 +27,7 @@ export default {
     blockTranslateDanmaku: '屏蔽翻译弹幕',
     translationSign: '翻译弹幕首字符',
     onlyOneCharacter: '只能输入一个字符，如【',
-    
+
     minGiftPrice: '打赏弹幕最低显示价格(元)',
     minTickerPrice: '打赏停驻栏最低显示价格(元)',
     maxNumber: '最大弹幕数',
@@ -38,7 +36,6 @@ export default {
 
     autoRenderOfficialEmoji: '自动添加官方表情',
     isGreedyMatch: '贪婪匹配',
-    isSkipSameImage: '不重复显示相同图片',
     imageShowType: '图片展示方式',
     imageShowTypes: [
       {
@@ -136,7 +133,7 @@ export default {
     global: '全局',
     danmakuAtBottom: '弹幕从底部出现',
     tickerAtButtom: '底部显示SC固定栏',
-    
+
     outlines: '描边',
     showOutlines: '显示描边',
     outlineSize: '描边尺寸',
@@ -171,13 +168,9 @@ export default {
     messages: '消息',
     color: '颜色',
     onNewLine: '在新行显示',
-    mergeSameUser: '合并同用户消息为组',
-    groupBlockPadding: '消息组内消息的间距',
-    
 
     time: '时间',
     showTime: '显示时间',
-    showTimeRight: '在右侧显示时间',
 
     backgrounds: '背景',
     bgColor: '背景色',
@@ -231,7 +224,7 @@ export default {
     guardLevel1: '总督',
     guardLevel2: '提督',
     guardLevel3: '舰长',
-    sendGift: '赠送 {giftName}x{num}',
+    sendGift: '{giftName}x{num}',
     membershipTitle: '新会员',
     tickerMembership: '会员'
   }

@@ -17,8 +17,6 @@ export default {
     showNewMember: '新メンバーを表示する',
     showGift: 'ギフトを表示する',
     showGiftInfo: 'ギフト内容を表示する',
-    mergeSameUserDanmaku: '同じリスナーのコメントを合併する',
-    mergeSameUserDanmakuInterval: '同じリスナーのコメントを合併するタイム間隔（秒）',
     mergeSimilarDanmaku: '同じコメントを合併する',
     mergeGift: 'ギフトを合併する',
 
@@ -38,7 +36,6 @@ export default {
 
     autoRenderOfficialEmoji: '自動表示公式スタンプ',
     isGreedyMatch: '貪欲(Greedy)マッチ',
-    isSkipSameImage: '相同画像を表示しない',
     imageShowType: 'スタンプの表現方',
     imageShowTypes: [
       {
@@ -172,12 +169,9 @@ export default {
     messages: 'コメント',
     color: '色',
     onNewLine: '新しい行に表示する',
-    mergeSameUser: '同じリスナーのコメントを合併する',
-    groupBlockPadding: 'コメントグループ内コメントの間隔距離',
 
     time: '時間',
     showTime: '時間を表示する',
-    showTimeRight: '時間を右側で表示する',
 
     backgrounds: '背景',
     bgColor: '背景色',

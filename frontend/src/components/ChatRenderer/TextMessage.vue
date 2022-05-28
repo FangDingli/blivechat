@@ -9,57 +9,98 @@
     :is-owner="authorType === 3"
     :is-deleted="isDelete"
     >
-    <div id="thread">
-      <template v-for="(richContent, richContentIndex) in richContents">
-        <div id="card" class="style-scope yt-live-chat-text-message-renderer">
-          <img-shadow id="author-photo" height="24" width="24" class="style-scope yt-live-chat-text-message-renderer"
-            :imgUrl="avatarUrl"
-          ></img-shadow>
-          <div id="content" class="style-scope yt-live-chat-text-message-renderer">
-            <yt-live-chat-author-chip class="style-scope yt-live-chat-text-message-renderer">
-              <span id="timestamp" class="style-scope yt-live-chat-text-message-renderer">{{timeText}}</span>
-              <span id="author-name" dir="auto" class="style-scope yt-live-chat-author-chip" :type="authorTypeText">{{
-                authorName
-                }}<!-- 这里是已验证勋章 -->
-                <span id="chip-badges" class="style-scope yt-live-chat-author-chip"></span>
-              </span>
-              <span id="chat-medal" class="style-scope yt-live-chat-author-chip">
-                <author-medal class="style-scope yt-live-chat-author-chip"
-                  :medalLevel="medalLevel" :medalName="medalName" :isFanGroup="isFanGroup"
+    <div id="card" class="style-scope yt-live-chat-text-message-renderer">
+      <div
+          class="w100p h100p chat_border1"
+          :style="{
+          outline: `6px solid ${currOption.color1}`,
+          backgroundColor: `${currOption.color1}`,
+        }"
+      >
+        <div class="chat_left">
+          <img :src="currOption.imgBaseUrl + '/circle_left.png'" alt="" />
+        </div>
+        <div class="chat_gadget_right_top">
+          <img :src="currOption.imgBaseUrl + '/hd.png'" alt="" />
+        </div>
+        <div class="chat_gadget_right">
+          <img :src="currOption.imgBaseUrl + '/circle_right.png'" alt="" />
+        </div>
+        <div class="split_block">
+          <SplitBlock :bgc="currOption.color1"></SplitBlock>
+        </div>
+        <div
+            class="w100p h100p chat_border2"
+            :style="{ outline: `6px solid ${currOption.color2}` }"
+        >
+          <div
+              class="w100p h100p chat_border3"
+              :style="{ outline: `4px dashed ${currOption.color2}` }"
+          >
+            <div class="chat_avatar_wrapper">
+              <div class="chat_avatar_container">
+                <img class="chat_avatar" :src="avatarUrl" alt="" @error="onLoadError" />
+                <div class="chat_avatar_border_container">
+                  <img
+                      class="chat_avatar_border"
+                      :src="currOption.imgBaseUrl + '/avatar.png'"
+                      alt
+                  />
+                </div>
+                <div class="chat_avatar_gadget">
+                  <img :src="currOption.imgBaseUrl + '/flower.png'" alt="" />
+                </div>
+                <div class="chat_avatar_gadget_bottom">
+                  <img :src="currOption.imgBaseUrl + '/avatar_gadget.png'" alt="" />
+                </div>
+              </div>
+            </div>
+
+            <div class="chat_content_container">
+              <div class="chat_content_top">
+                <span
+                    class="chat_content_name"
+                    :style="{ borderBottom: `3px solid ${currOption.color1}` }"
+                >
+                  {{ authorName }}
+                </span>
+                <author-medal
+                    class="chat_medal"
+                    :medalLevel="medalLevel"
+                    :medalName="medalName"
+                    :isFanGroup="isFanGroup"
                 ></author-medal>
-              </span>
-              <span id="chat-badges" class="style-scope yt-live-chat-author-chip">
-                <author-badge class="style-scope yt-live-chat-author-chip"
-                  :isAdmin="authorType === 2" :privilegeType="privilegeType"
-                ></author-badge>
-              </span>
-            </yt-live-chat-author-chip>
-            <!-- 直接替换表情包 -->
-            <div id='image-and-message' class="style-scope yt-live-chat-text-message-renderer">
-              <template v-for="(content, contentIndex) in richContent">
-                <span :key="contentIndex" v-if="content.type === CONTENT_TYPE_TEXT" id="message" class="style-scope yt-live-chat-text-message-renderer"
-                  display="block"
-                >{{ content.text }}</span>
-                <img :key="contentIndex" v-else-if="content.type === CONTENT_TYPE_IMAGE"
-                  class="image yt-formatted-string style-scope yt-live-chat-text-message-renderer"
-                  :style="`display: ${content.align};`"
-                  width="auto"
-                  :src="content.url" :alt="content.text" :shared-tooltip-text="content.text" :id="`image-${content.text}`"
-                  :height="content.height"
-                  :display="content.align"
-                >
-                <img :key="contentIndex" v-else-if="content.type === CONTENT_TYPE_EMOTICON"
-                  class="emoji yt-formatted-string style-scope yt-live-chat-text-message-renderer"
-                  :src="content.url" :alt="content.text" :shared-tooltip-text="content.text" :id="`emoji-${content.text}`"
-                >
-              </template>
-              <el-badge :value="getRepeatedValue(richContentIndex)" :max="99" v-show="getRepeatedValue(richContentIndex) > 1" class="style-scope yt-live-chat-text-message-renderer"
-                :style="{ '--repeated-mark-color': repeatedMarkColor }"
-              ></el-badge>
+              </div>
+              <div class="chat_content_bottom">
+                <template v-for="(richContent,index) in richContent">
+                  <span :key="index" v-if="richContent.type === CONTENT_TYPE_TEXT">{{
+                      richContent.text
+                    }}</span>
+                  <img
+                      :key="index"
+                      v-else-if="richContent.type === CONTENT_TYPE_EMOJI"
+                      :src="richContent.url"
+                      :alt="richContent.text"
+                      :shared-tooltip-text="richContent.text"
+                      :id="`emoji-${richContent.text}`"
+                      :class="isOfficialEmotion(richContent.url)? 'uploader_emoticon' : 'official_emoticon'"
+                  />
+                  <span class="emoji_alt_text" v-if="richContent.type === CONTENT_TYPE_EMOJI">{{
+                      content
+                    }}</span>
+                </template>
+                <el-badge
+                    :value="repeated"
+                    :max="99"
+                    v-if="repeated > 1"
+                    class="style-scope yt-live-chat-text-message-renderer"
+                    :style="{ '--repeated-mark-color': repeatedMarkColor }"
+                ></el-badge>
+              </div>
             </div>
           </div>
         </div>
-      </template>
+      </div>
     </div>
   </yt-live-chat-text-message-renderer>
 </template>
@@ -70,6 +111,7 @@ import AuthorMedal from './AuthorMedal'
 import AuthorBadge from './AuthorBadge'
 import * as constants from './constants'
 import * as utils from '@/utils'
+import SplitBlock from './SplitBlock.vue'
 
 // HSL
 const RANDOM_TEXT_COLOR_START = [0, 100.0, 55.0]
@@ -84,13 +126,59 @@ export default {
     return {
       CONTENT_TYPE_TEXT: constants.CONTENT_TYPE_TEXT,
       CONTENT_TYPE_IMAGE: constants.CONTENT_TYPE_IMAGE,
-      CONTENT_TYPE_EMOTICON: constants.CONTENT_TYPE_EMOTICON
+      CONTENT_TYPE_EMOJI: constants.CONTENT_TYPE_EMOJI,
+      currOption: this.getAuthorOpt(this.privilegeType),
+      showImgUrl: this.avatarUrl,
     }
+  },
+  methods:{
+    isOfficialEmotion(url){
+      if (url.indexOf('/bfs/garb')!=-1){
+        return true
+      }
+      return  false
+    },
+    getAuthorOpt(num) {
+      const opt = [
+        {
+          type: '观众',
+          color1: '#f06363',
+          color2: '#ffa4a4',
+          imgBaseUrl: '/static/img/chat/gz',
+        },
+        {
+          type: '总督',
+          color1: '#a37fff',
+          color2: '#c3a4fb',
+          imgBaseUrl: '/static/img/chat/td',
+        },
+        {
+          type: '提督',
+          color1: '#a37fff',
+          color2: '#c3a4fb',
+          imgBaseUrl: '/static/img/chat/td',
+        },
+        {
+          type: '舰长',
+          color1: '#7d9de6',
+          color2: '#a6c8ff',
+          imgBaseUrl: '/static/img/chat/jz',
+        },
+      ]
+
+      return opt[num]
+    },
+    onLoadError() {
+      if (this.showImgUrl !== avatar.DEFAULT_AVATAR_URL) {
+        this.showImgUrl = avatar.DEFAULT_AVATAR_URL
+      }
+    },
   },
   components: {
     ImgShadow,
     AuthorMedal,
-    AuthorBadge
+    AuthorBadge,
+    SplitBlock
   },
   props: {
     avatarUrl: String,
@@ -102,20 +190,13 @@ export default {
     isFanGroup: Boolean,
     isDelete: Boolean,
     emoticon: String,
-    contents: Array,
-    richContents: Array,
+    content: String,
+    richContent: Array,
     privilegeType: Number,
     repeated: Number,
-    repeatedThread: Array,
     imageShowType: Number,
     maxImage: Number,
     maxEmoji: Number
-  },
-  methods: {
-    getRepeatedValue(index) {
-      // console.log(`index ${index}: ${this.repeatedThread[index]}`)
-      return this.repeatedThread[index]
-    },
   },
   computed: {
     timeText() {
@@ -133,7 +214,6 @@ export default {
       }
       return `hsl(${color[0]}, ${color[1]}%, ${color[2]}%)`
     },
-    
     repeatedMarkColor() {
       let color
       if (this.repeated <= 2) {
@@ -159,7 +239,7 @@ yt-live-chat-text-message-renderer>#content .el-badge {
 }
 
 yt-live-chat-text-message-renderer>#content .el-badge .el-badge__content {
-  font-size: 14px !important;
+  font-size: 12px !important;
   line-height: 18px !important;
   text-shadow: none !important;
   font-family: sans-serif !important;

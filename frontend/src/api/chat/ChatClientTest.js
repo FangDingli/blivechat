@@ -6,11 +6,7 @@ const NAMES = [
   'xfgryujk', 'Simon', 'Il Harper', 'Kinori', 'shugen', 'yuyuyzl', '3Shain', '光羊', '黑炎', 'Misty', '孤梦星影',
   'ジョナサン・ジョースター', 'ジョセフ・ジョースター', 'ディオ・ブランドー', '空條承太郎', '博丽灵梦', '雾雨魔理沙', 'Rick Astley',
   '只熊KUMA', 'DoodleBear', '椅子_Official', '星界璃海', '玲玲', '海式policturn', '小川尚未', '梅林Kitsune', '因扎因·内比娅',
-  '只熊KUMA', 'DoodleBear', '椅子_Official', '星界璃海', '玲玲', '海式policturn', '小川尚未', '梅林Kitsune', '因扎因·内比娅',
-  '只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA',
-  '只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA',
-  '只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA','只熊KUMA'
-
+  '只熊KUMA', 'DoodleBear', '椅子_Official', '星界璃海', '玲玲', '海式policturn', '小川尚未', '梅林Kitsune', '因扎因·内比娅'
 ]
 
 const MEDAL_NAME = [
@@ -93,18 +89,18 @@ const EMOTICONS = [
 ]
 
 const AUTHOR_TYPES = [
-  { weight: 2, value: constants.AUTHOR_TYPE_NORMAL },
-  { weight: 3, value: constants.AUTHOR_TYPE_MEMBER },
-  { weight: 1, value: constants.AUTHOR_TYPE_ADMIN },
-  { weight: 1, value: constants.AUTHOR_TYPE_OWNER }
+  { weight: 2, value: constants.AUTHRO_TYPE_NORMAL },
+  { weight: 3, value: constants.AUTHRO_TYPE_MEMBER },
+  { weight: 1, value: constants.AUTHRO_TYPE_ADMIN },
+  { weight: 1, value: constants.AUTHRO_TYPE_OWNER }
 ]
 
 function randGuardInfo() {
   let authorType = randomChoose(AUTHOR_TYPES)
   let privilegeType
-  if (authorType === constants.AUTHOR_TYPE_MEMBER) {
+  if (authorType === constants.AUTHRO_TYPE_MEMBER) {
     privilegeType = randInt(1, 3)
-  } else if (authorType === constants.AUTHOR_TYPE_ADMIN) {
+  } else if (authorType === constants.AUTHRO_TYPE_ADMIN) {
     privilegeType = randInt(0, 3)
   } else {
     privilegeType = 0
@@ -180,7 +176,7 @@ const MESSAGE_GENERATORS = [
     weight: 5,
     value() {
       return {
-        type: constants.MESSAGE_TYPE_TEXT,
+        type: constants.CONTENT_TYPE_EMOJI,
         message: {
           ...randGuardInfo(),
           avatarUrl: avatar.DEFAULT_AVATAR_URL,

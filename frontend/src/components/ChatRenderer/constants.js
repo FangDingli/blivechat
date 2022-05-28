@@ -1,18 +1,13 @@
+export const IMAGE_SHOW_TYPE_REPLACE_DIRECT = 0
+export const IMAGE_SHOW_TYPE_REPLACE = 1
+export const IMAGE_SHOW_TYPE_ADD_AFTER = 2
+
 import * as i18n from '@/i18n'
 
-export const IMAGE_SHOW_TYPE_REPLACE = 0
-export const IMAGE_SHOW_TYPE_ADD_AFTER = 1
-
-export const PRIVILEGE_TYPE_ALL = 0
-export const PRIVILEGE_TYPE_MEMBER_1 = 3 // 舰长
-export const PRIVILEGE_TYPE_MEMBER_2 = 2 // 提督
-export const PRIVILEGE_TYPE_MEMBER_3 = 1 // 总督
-
-
-export const AUTHOR_TYPE_NORMAL = 0
-export const AUTHOR_TYPE_MEMBER = 1
-export const AUTHOR_TYPE_ADMIN = 2
-export const AUTHOR_TYPE_OWNER = 3
+export const AUTHRO_TYPE_NORMAL = 0
+export const AUTHRO_TYPE_MEMBER = 1
+export const AUTHRO_TYPE_ADMIN = 2
+export const AUTHRO_TYPE_OWNER = 3
 
 export const AUTHOR_TYPE_TO_TEXT = [
   '',
@@ -124,16 +119,67 @@ export const MEDAL_CONFIGS = [
       textColor:`#5c968e`
     }
   }
-  
+
 ]
 
 export const CONTENT_TYPE_TEXT = 0
 export const CONTENT_TYPE_IMAGE = 1
-export const CONTENT_TYPE_EMOTICON = 2
+export const CONTENT_TYPE_EMOJI = 2
+
+export const PRICE_CONFIGS = [
+  {
+    price: 500,
+    imgFolder: '500',
+    primaryColor: "#EB0000",
+    secondColor: "#FF5A5A",
+    colors: {
+      headerBg: 'rgba(208,0,0,1)',
+      contentBg: 'rgba(230,33,23,1)',
+      dividerColor: 'rgba(150,33,23,1)',
+      header: 'rgba(255,255,255,1)',
+      authorName: 'rgba(255,255,255,0.701961)',
+      time: 'rgba(255,255,255,0.501961)',
+      content: 'rgba(255,255,255,1)'
+    },
+    pinTime: 15
+  },
+  {
+    price: 100,
+    imgFolder: '100-500',
+    primaryColor: "#F17C1D",
+    secondColor: "#FFA975",
+    colors: {
+      headerBg: 'rgba(208,0,0,1)',
+      contentBg: 'rgba(230,33,23,1)',
+      dividerColor: 'rgba(150,33,23,1)',
+      header: 'rgba(255,255,255,1)',
+      authorName: 'rgba(255,255,255,0.701961)',
+      time: 'rgba(255,255,255,0.501961)',
+      content: 'rgba(255,255,255,1)'
+    },
+    pinTime: 15
+  },
+  {
+    price: 0,
+    imgFolder: '30-100',
+    primaryColor: "#F1D61D",
+    secondColor: "#FFEA75",
+    colors: {
+      headerBg: 'rgba(208,0,0,1)',
+      contentBg: 'rgba(230,33,23,1)',
+      dividerColor: 'rgba(150,33,23,1)',
+      header: 'rgba(255,255,255,1)',
+      authorName: 'rgba(255,255,255,0.701961)',
+      time: 'rgba(255,255,255,0.501961)',
+      content: 'rgba(255,255,255,1)'
+    },
+    pinTime: 15
+  }
+]
 
 // 美元 -> 人民币 汇率
 // const EXCHANGE_RATE = 7
-export const PRICE_CONFIGS = [
+/* export const PRICE_CONFIGS = [
   { // RMB 1000红
     price: 1000,
     colors: {
@@ -225,7 +271,7 @@ export const PRICE_CONFIGS = [
     },
     pinTime: 0.08
   }
-]
+] */
 
 export function getMedalConfig (level) {
   for (const config of MEDAL_CONFIGS) {
@@ -246,36 +292,21 @@ export function getPriceConfig(price) {
 }
 
 export function getShowContent(message) {
-  let newMessage = message.content[message.threadLength - 1]
-  // console.log(`newMsg: ${newMessage}`)
   if (message.translation) {
-    // TODO: 新的翻译句子，只用翻译最新的句子
-    if(message.type === MESSAGE_TYPE_TEXT) {
-      message.content[message.threadLength - 1] = `${newMessage.content}（${newMessage.translation}）`
-      return message.content
-    } else {
-      return `${message.content}（${message.translation}）`
-    }
+    return `${message.content}（${message.translation}）`
   }
   return message.content
 }
 
 export function getShowRichContent(message) {
-  
-  let newRichContent = message.richContent[message.threadLength - 1]
-  // console.log(`richContents 长度: ${message.richContent.length}`)
-  // console.log(`newRichContent 长度: ${newRichContent.length}`)
+  let richContent = [...message.richContent]
   if (message.translation) {
-    // 只需要在最新消息的 richContent (Array) 里面再塞入一行 Text 作为 translation
-    newRichContent.push({
+    richContent.push({
       type: CONTENT_TYPE_TEXT,
       text: `（${message.translation}）`
     })
-    message.richContent[message.threadLength - 1] = newRichContent
   }
-  // console.log(`getShowRichContent, length: ${message.richContent.length}`)
-
-  return message.richContent
+  return richContent
 }
 
 export function getGiftShowContent (message, showGiftInfo) {

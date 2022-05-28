@@ -62,16 +62,6 @@
                   <el-switch v-model="form.mergeGift"></el-switch>
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="4">
-                <el-form-item :label="$t('home.mergeSameUserDanmaku')">
-                  <el-switch v-model="form.mergeSameUserDanmaku"></el-switch>
-                </el-form-item>
-              </el-col>
-              <el-col :xs="24" :sm="8">
-                <el-form-item :label="$t('home.mergeSameUserDanmakuInterval')">
-                  <el-input v-model.number="form.mergeSameUserDanmakuInterval" type="number" min="1"></el-input>
-                </el-form-item>
-              </el-col>
             </el-row>
             <el-row :gutter="20">
               <el-col :xs="24" :sm="4">
@@ -186,23 +176,16 @@
           </el-tab-pane>
           <el-tab-pane :label="$t('home.emoticon')">
             <el-row :gutter="20">
-              <el-col :xs="24" :sm="8">
+              <el-col :xs="24" :sm="6">
                 <el-form-item :label="$t('home.autoRenderOfficialEmoji')">
                   <el-switch v-model="form.autoRenderOfficialEmoji"></el-switch>
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="8">
+              <el-col :xs="24" :sm="6">
                 <el-form-item :label="$t('home.isGreedyMatch')">
                   <el-switch v-model="form.isGreedyMatch"></el-switch>
                 </el-form-item>
               </el-col>
-              <el-col :xs="24" :sm="8">
-                <el-form-item :label="$t('home.isSkipSameImage')">
-                  <el-switch v-model="form.isSkipSameImage"></el-switch>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
               <el-col :xs="24" :sm="12">
                 <el-form-item :label="$t('home.imageShowType')">
                   <el-select ref="imageShowTypeInput" v-model="form.imageShowType">
@@ -372,6 +355,7 @@ export default {
     },
 
     addEmoticon() {
+      // TODO: 增加图片大小
       this.form.emoticons.splice(0, 0, {
         keyword: '[emoji_keyword]',
         align: 'inline',
@@ -382,6 +366,7 @@ export default {
     },
 
     addPicture() {
+      // TODO: 增加图片大小
       this.form.emoticons.splice(0, 0, {
         keyword: '[pic_keyword]',
         align: 'block',

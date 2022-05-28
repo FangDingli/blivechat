@@ -1,46 +1,53 @@
 <template>
-  <yt-live-chat-paid-message-renderer class="style-scope yt-live-chat-item-list-renderer" allow-animations
-    :show-only-header="priceText == '银瓜子礼物'" :style="{
-      '--yt-live-chat-paid-message-secondary-color': priceRange.colors.headerBg,
-      '--yt-live-chat-paid-message-primary-color': priceRange.colors.contentBg,
-      '--yt-live-chat-paid-message-divider-color': priceRange.colors.dividerColor,
-      '--yt-live-chat-paid-message-header-color': priceRange.colors.header,
-      '--yt-live-chat-paid-message-author-name-color': priceRange.colors.authorName,
-      '--yt-live-chat-paid-message-timestamp-color': priceRange.colors.time,
-      '--yt-live-chat-paid-message-color': priceRange.colors.content
-    }"
-    :giftName="giftName" :price="price" :price-level="priceRange.price"
-    :is-deleted="isDelete"
+  <yt-live-chat-paid-message-renderer class="style-scope yt-live-chat-item-list-renderer" allow-animations :giftName="giftName"
   >
-    <div id="card" class="style-scope yt-live-chat-paid-message-renderer">
-      <div id="header" class="style-scope yt-live-chat-paid-message-renderer">
-        <img-shadow id="author-photo" height="40" width="40" class="style-scope yt-live-chat-paid-message-renderer"
-          :imgUrl="avatarUrl"
-        ></img-shadow>
-        <div id="header-content" class="style-scope yt-live-chat-paid-message-renderer">
-          <div id="header-content-primary-column" class="style-scope yt-live-chat-paid-message-renderer">
-            <div id="author-name" class="style-scope yt-live-chat-paid-message-renderer">{{authorName}}</div>
-            <div id="purchase-amount" class="style-scope yt-live-chat-paid-message-renderer">{{priceText == '银瓜子礼物'? content : priceText}}</div>
-          </div>
-          <span id="timestamp" class="style-scope yt-live-chat-paid-message-renderer">{{ timeText }}</span>
-        </div>
-      </div>
-      <div id="content" class="style-scope yt-live-chat-paid-message-renderer">
-        <div id="message" dir="auto" class="style-scope yt-live-chat-paid-message-renderer">{{ content }}</div>
-      </div>
-    </div>
+    <SCMessageCard
+        v-if="giftName === 'superchat'"
+        :bgBaseUrl="bgUrl"
+        :avatarUrl="avatarUrl"
+        :authorName="authorName"
+        :content="content"
+        :scPrimaryColor="scPrimaryColor"
+        :scSecondColor="scSecondColor"
+        :priceText="priceText"
+    ></SCMessageCard>
+    <GiftMessageCard
+        v-else
+        :linearColor1="price > 0 ? '#caa6ff' : '#a6c8ff'"
+        :linearColor2="price > 0 ? '#f0d7ff' : '#d7e4ff'"
+        :secondColor="price > 0 ? '#be95fd' : '#a6c8ff'"
+        :shape1Color="price > 0 ? '#AB82FF' : '#829AFF'"
+        :shape2Color="price > 0 ? '#8D5BFE' : '#5B79FE'"
+        :giftName="giftName"
+        :content="content"
+        :avatarUrl="avatarUrl"
+        :authorName="authorName"
+        :bgBaseUrl="bgUrl"
+    ></GiftMessageCard>
   </yt-live-chat-paid-message-renderer>
 </template>
 
 <script>
 import ImgShadow from './ImgShadow'
+import SCMessageCard from './SCMessageCard.vue'
+import GiftMessageCard from './GiftMessageCard.vue'
 import * as constants from './constants'
 import * as utils from '@/utils'
 
 export default {
   name: 'PaidMessage',
+  data() {
+    return {
+      bgUrl: '',
+      giftbgUrl: '',
+      scPrimaryColor: '',
+      scSecondColor: '',
+    }
+  },
   components: {
-    ImgShadow
+    ImgShadow,
+    SCMessageCard,
+    GiftMessageCard
   },
   props: {
     avatarUrl: String,
@@ -50,6 +57,20 @@ export default {
     time: Date,
     content: String,
     isDelete: Boolean
+  },
+  created() {
+    if (this.giftName == 'superchat') {
+      const { imgFolder, primaryColor, secondColor } = constants.getPriceConfig(this.price)
+      this.bgUrl = '/static/img/sc/' + imgFolder
+      this.scPrimaryColor = primaryColor
+      this.scSecondColor = secondColor
+    } else {
+      if (this.price) {
+        this.bgUrl = '/static/img/gift/ff'
+      } else {
+        this.bgUrl = '/static/img/gift/mf'
+      }
+    }
   },
   computed: {
     priceRange() {
